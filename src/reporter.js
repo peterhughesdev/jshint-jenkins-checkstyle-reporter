@@ -1,5 +1,6 @@
 // Author: Boy Baukema
 // Modifications for Jenkins JSHint reporter: Sublimeye, Roman Morozov <sublimeye.ua@gmail.com>
+var fs = require('fs');
 
 module.exports =
 {
@@ -83,6 +84,21 @@ module.exports =
 
 		out.push("</checkstyle>");
 
-		process.stdout.write(out.join("\n") + "\n");
+		var xml = out.join("\n");
+
+		if (opts.output) {
+			// Allow custom output functions
+			if (opts.output instanceof Function) {
+				opts.output(xml);
+			}
+
+			// Write to a specified file location
+			if (typeof opts.output === 'string') {
+				var outStream = fs.createWriteStream(opts.filename);
+				outStream.write(xml)
+			}
+		} else {
+			process.stdout.write(xml + "\n");
+		}
 	}
 };
